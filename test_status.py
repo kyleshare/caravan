@@ -8,7 +8,7 @@ import os
 #directory = os.getcwd()
 
 #function takes file/folder names in path, returns correct file path based on os
-filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Copy of PRODUCTION LOG _ 2019 _MASTER.xlsx' )
+filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'caravan', 'Copy of PRODUCTION LOG _ 2019 _MASTER.xlsx' )
 
 wb = openpyxl.load_workbook(filepath)
 print(type(wb))
@@ -21,24 +21,29 @@ print("All sheet_names are", sheet_names)
 first_sheet = wb.active
 print("The first sheet is", first_sheet)
 
-print(first_sheet.cell(row=1921, column=1).value)
-
+#print(first_sheet.cell(row=1921, column=1).value)
 #print(first_sheet.min_row)
 #print(first_sheet.max_row)
 #print(first_sheet.max_column)
 
-#Tuple (Row number, Row dimension)
+
+#Open new status file to write on
+status_file = open('status.txt', 'w+')
 for row_num, j in first_sheet.row_dimensions.items():
     #Check if row is hidden
     if j.hidden == False:
-        print("Row #", row_num)
         #ID is column 1 for every visible cell
         ID = (first_sheet.cell(row=row_num, column=1).value)
         #Status is column 1 for every visible cell
         status = (first_sheet.cell(row=row_num, column=3).value)
         #Filter out visible cells that contain no data
         if ID is not None and status is not None:
+            status = status.lower()
+            print("Row #", row_num)
             print([ID, status])
+            status_file.write('{} {}\n'.format(ID, status))
+status_file.close()
+
 
 
 
