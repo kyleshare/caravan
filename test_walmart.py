@@ -26,8 +26,51 @@ new_first_sheet = new_wb.active
 print("The first sheet is", new_first_sheet)
 #print(new_wb.sheetnames)
 
+def account():
+    for row_num in range(2, first_sheet.max_row):
+        new_first_sheet.cell(row = row_num, column = 1).value = 'wmecom'
+
+def po_num():
+    for row_num in range(2, first_sheet.max_row):
+        po = first_sheet.cell(row = row_num, column = 1).value
+        new_first_sheet.cell(row = row_num, column = 2).value = po
+
+def po_line():
+    for row_num in range(2, first_sheet.max_row):
+        line = first_sheet.cell(row = row_num, column = 16).value
+        new_first_sheet.cell(row = row_num, column = 3).value = line
+
+#Maybe I should hide this for legal reasons?
+def customer_name():
+    for row_num in range(2, first_sheet.max_row):
+        name = first_sheet.cell(row = row_num, column = 5).value
+        new_first_sheet.cell(row = row_num, column = 4).value = name
+
+def address_1():
+    for row_num in range(2, first_sheet.max_row):
+        address = first_sheet.cell(row = row_num, column = 6).value
+        new_first_sheet.cell(row = row_num, column = 5).value = address
+
+#This might be wrong. Im copying from shipping address but maybe it should 
+def phone_num():
+    for row_num in range(2, first_sheet.max_row):
+        phone = first_sheet.cell(row = row_num, column = 7).value
+        new_first_sheet.cell(row = row_num, column = 6).value = phone
 
 
+def address_2():
+    for row_num in range(2, first_sheet.max_row):
+        address2 = first_sheet.cell(row = row_num, column = 10).value
+        new_first_sheet.cell(row = row_num, column = 7).value = address2
+
+def carrier():
+    pass
+
+def item_num():
+    pass
+
+
+'''
 #Iterate through each column
 for col_num in range(1, first_sheet.max_column):
     #print(col_num)
@@ -37,6 +80,14 @@ for col_num in range(1, first_sheet.max_column):
         data = first_sheet.cell(row=row_num, column = col_num).value
         #print("Good")
         new_first_sheet.cell(row = row_num, column = col_num).value = data
+'''
+account()
+po_num()
+po_line()
+customer_name()
+address_1()
+phone_num()
+address_2()
 
 #Pass file name to save
 new_wb.save("test_copy.xlsx")
