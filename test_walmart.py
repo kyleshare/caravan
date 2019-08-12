@@ -33,7 +33,7 @@ def titles():
 
 def account():
     for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 1).value = 'wmecom'
+        new_first_sheet.cell(row = row_num, column = 1).value = 'WMECOM'
 
 def po_num():
     for row_num in range(2, first_sheet.max_row + 1):
@@ -63,7 +63,11 @@ def phone_num():
 
 def address_2():
     for row_num in range(2, first_sheet.max_row + 1):
-        address2 = first_sheet.cell(row = row_num, column = 10).value
+        city = first_sheet.cell(row = row_num, column = 11).value
+        state = first_sheet.cell(row = row_num, column = 12).value
+        zip_code = first_sheet.cell(row = row_num, column = 13).value
+
+        address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = row_num, column = 7).value = address2
 
 def carrier():
