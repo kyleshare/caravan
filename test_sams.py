@@ -2,10 +2,10 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
+filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
+#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -23,10 +23,10 @@ new_first_sheet = new_wb.active
 
 def titles():
     titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
-    "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", "QTY", \
-    "UNIT PRICE", "TERMS"]
+    "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", \
+    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS"]
     title_index = 0
-    for column_num in range(1, 14):
+    for column_num in range(1, 15):
         new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
         title_index += 1
 
@@ -49,8 +49,8 @@ def record_type():
                po_line(writing_row = row_num - counter, row = row_num)
                item_num(writing_row = row_num - counter, row = row_num)
                item_desc(writing_row = row_num - counter, row = row_num)
-               quantity(writing_row = row_num - counter, row = row_num)
                unit_price(writing_row = row_num - counter, row = row_num)
+               quantity(writing_row = row_num - counter, row = row_num)
                continue
 
            #If PO changes, copy header of order
@@ -109,16 +109,17 @@ def item_desc(writing_row, row):
     item_desc = first_sheet.cell(row = row, column = 21).value
     new_first_sheet.cell(row = writing_row, column = 10).value = item_desc
 
-def quantity(writing_row, row):
-    quantity = first_sheet.cell(row = row, column = 14).value
-    new_first_sheet.cell(row = writing_row, column = 11).value = quantity
-
 def unit_price(writing_row, row):
     unit_price = first_sheet.cell(row = row, column = 16).value
-    new_first_sheet.cell(row = writing_row, column = 12).value = unit_price
+    new_first_sheet.cell(row = writing_row, column = 11).value = unit_price
+
+def quantity(writing_row, row):
+    quantity = first_sheet.cell(row = row, column = 14).value
+    new_first_sheet.cell(row = writing_row, column = 12).value = quantity
+
 
 def terms(writing_row, row):
-    new_first_sheet.cell(row = writing_row, column = 13).value = 'NET 60'
+    new_first_sheet.cell(row = writing_row, column = 14).value = 'NET 60'
 
 def fill_empty_cells():
     for row_num in range(2, new_first_sheet.max_row + 1):
@@ -146,13 +147,21 @@ def fill_empty_cells():
             previous_carrier = new_first_sheet.cell(row = row_num - 1, column = 8).value
             new_first_sheet.cell(row = row_num, column = 8).value = previous_carrier
 
-            previous_terms = new_first_sheet.cell(row = row_num - 1, column = 13).value
-            new_first_sheet.cell(row = row_num, column = 13).value = previous_terms
+            previous_terms = new_first_sheet.cell(row = row_num - 1, column = 14).value
+            new_first_sheet.cell(row = row_num, column = 14).value = previous_terms
+
+#Use quantity and Unit price to calculate line total
+def line_total():
+    for row_num in range(2, new_first_sheet.max_row + 1):
+      line_total = new_first_sheet.cell(row = row_num, column = 11).value * \
+      new_first_sheet.cell(row = row_num, column = 12).value
+      new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
 def main():
     titles()
     record_type()
     fill_empty_cells()
+    line_total()
 
 
 main()

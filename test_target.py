@@ -2,10 +2,10 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'TRAGET.XLSX' )
+filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'TRAGET.XLSX' )
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'TARGET.XLSX' )
+#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'TARGET.XLSX' )
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -26,13 +26,13 @@ final_first_sheet = final_wb.active
 
 
 def titles():
-        titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
-        "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", "QTY", \
-        "UNIT PRICE", "TERMS"]
-        title_index = 0
-        for column_num in range(1, 14):
-            new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
-            title_index += 1
+    titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
+    "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", \
+    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS"]
+    title_index = 0
+    for column_num in range(1, 15):
+        new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
+        title_index += 1
 
 def account():
     for row_num in range(2, first_sheet.max_row + 1):
@@ -91,20 +91,21 @@ def item_desc(column_num):
     for row_num in range(2, first_sheet.max_row + 1):
         item_desc = first_sheet.cell(row = row_num, column = 20).value
         new_first_sheet.cell(row = row_num, column = 10).value = item_desc
-#2,
-def quantity(column_num):
-    for row_num in range(2, first_sheet.max_row + 1):
-        quantity = first_sheet.cell(row = row_num, column = 13).value
-        new_first_sheet.cell(row = row_num, column = 11).value = quantity
+
 #2
 def unit_price(column_num):
     for row_num in range(2, first_sheet.max_row + 1):
         price = first_sheet.cell(row = row_num, column = 15).value
-        new_first_sheet.cell(row = row_num, column = 12).value = price
+        new_first_sheet.cell(row = row_num, column = 11).value = price
+#2
+def quantity(column_num):
+    for row_num in range(2, first_sheet.max_row + 1):
+        quantity = first_sheet.cell(row = row_num, column = 13).value
+        new_first_sheet.cell(row = row_num, column = 12).value = quantity
 
 def terms():
     for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 13).value = 'NET 30'
+        new_first_sheet.cell(row = row_num, column = 14).value = 'NET 30'
 
 def count_rows():
     total_rows = 0
@@ -121,13 +122,21 @@ def remove_empty_cells(total_rows):
         #For each column, row initialized to 1
         final_sheet_row = 1
         #Iterate through each row in a column
-        for row_num in range(2, new_first_sheet.max_row + 1):
+        for row_num in range(1, new_first_sheet.max_row + 1):
                 new_cell = new_first_sheet.cell(row = row_num, column = column_num).value
                 #If cell is not empty and row is < total rows
                 if new_cell not in [None, "None, None None"] and final_sheet_row < total_rows:
                     final_first_sheet.cell(row = final_sheet_row, column = column_num).value = new_cell
                     final_sheet_row += 1
     return final_wb
+
+#Use quantity and Unit price to calculate line total
+def line_total():
+    for row_num in range(2, final_first_sheet.max_row + 1):
+      line_total = final_first_sheet.cell(row = row_num, column = 11).value * \
+      final_first_sheet.cell(row = row_num, column = 12).value
+      final_first_sheet.cell(row = row_num, column = 13).value = line_total
+
 
 
 def main():
@@ -142,12 +151,14 @@ def main():
     carrier(24)
     item_num(18)
     item_desc(20)
-    quantity(13)
     unit_price(15)
+    quantity(13)
     terms()
 
     total_rows = count_rows()
     remove_empty_cells(total_rows)
+
+    line_total()
 
 main()
 

@@ -2,10 +2,10 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '1WALMART W.H.XLSX' )
+filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '1WALMART W.H.XLSX' )
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
+#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
 
 
 #Get workbook from filepath
@@ -23,13 +23,13 @@ new_first_sheet = new_wb.active
 
 
 def titles():
-        titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
-        "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", "QTY", \
-        "UNIT PRICE", "TERMS"]
-        title_index = 0
-        for column_num in range(1, 14):
-            new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
-            title_index += 1
+    titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
+    "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", \
+    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS"]
+    title_index = 0
+    for column_num in range(1, 15):
+        new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
+        title_index += 1
 
 def account():
     for row_num in range(2, first_sheet.max_row + 1):
@@ -80,22 +80,31 @@ def item_num():
         item_num = first_sheet.cell(row = row_num, column = 18).value
         new_first_sheet.cell(row = row_num, column = 9).value = item_num
 
+#May have 2 item desc
 def item_desc():
     for row_num in range(2, first_sheet.max_row + 1):
         item_desc = first_sheet.cell(row = row_num, column = 20).value
         new_first_sheet.cell(row = row_num, column = 10).value = item_desc
+
+def unit_price():
+    pass
 
 def quantity():
     for row_num in range(2, first_sheet.max_row + 1):
         quantity = first_sheet.cell(row = row_num, column = 21).value
         new_first_sheet.cell(row = row_num, column = 11).value = quantity
 
-def unit_price():
-    pass
 
 def terms():
     for row_num in range(2, first_sheet.max_row + 1):
         new_first_sheet.cell(row = row_num, column = 13).value = 'NET 30'
+
+#Use quantity and Unit price to calculate line total
+def line_total():
+    for row_num in range(2, first_sheet.max_row + 1):
+      line_total = first_sheet.cell(row = row_num, column = 11).value * \
+      first_sheet.cell(row = row_num, column = 12).value
+      first_sheet.cell(row = row_num, column = 13).value = line_total
 
 def main():
     titles()
@@ -109,9 +118,10 @@ def main():
     carrier()
     item_num()
     item_desc()
-    quantity()
     unit_price()
+    quantity()
     terms()
+    #line_total()
 
 main()
 
