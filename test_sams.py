@@ -2,11 +2,10 @@ import openpyxl
 import os
 
 #MAC filepath
-filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
 
 #WINDOWS filepath
-#filepath = os.path.join('C:', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
-
+filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -23,100 +22,139 @@ new_first_sheet = new_wb.active
 
 
 def titles():
-        titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
-        "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", "QTY", \
-        "UNIT PRICE", "TERMS"]
-        title_index = 0
-        for column_num in range(1, 14):
-            new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
-            title_index += 1
+    titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
+    "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", "QTY", \
+    "UNIT PRICE", "TERMS"]
+    title_index = 0
+    for column_num in range(1, 14):
+        new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
+        title_index += 1
+
+def record_type():
+       counter = 0
+       first_po = None
+       #If new_line is true, create new line
+       new_line = False
+       for row_num in range(2, first_sheet.max_row + 1):
+           #If PO does not change, copy details of order to same header
+           if first_sheet.cell(row = row_num, column = 1).value == first_po:
+               #If new_line == True, we want a new line even though po stays same
+               #Therefore, don't increase counter
+               if new_line == False:
+                   print("new_line is False")
+                   new_line = True
+                   counter += 1
+                   print("counter is", counter)
+               print("These functions will write to line", row_num - counter)
+               po_line(writing_row = row_num - counter, row = row_num)
+               item_num(writing_row = row_num - counter, row = row_num)
+               item_desc(writing_row = row_num - counter, row = row_num)
+               quantity(writing_row = row_num - counter, row = row_num)
+               unit_price(writing_row = row_num - counter, row = row_num)
+               continue
+
+           #If PO changes, copy header of order
+           new_line = False
+           first_po = first_sheet.cell(row = row_num, column = 1).value
+           account(writing_row = row_num - counter, row = row_num)
+           po_num(writing_row = row_num - counter, row = row_num)
+           customer_name(writing_row = row_num - counter, row = row_num)
+           address_1(writing_row = row_num - counter, row = row_num)
+           phone_num(writing_row = row_num - counter, row = row_num)
+           address_2(writing_row = row_num - counter, row = row_num)
+           carrier(writing_row = row_num - counter, row = row_num)
+           terms(writing_row = row_num - counter, row = row_num)
 
 
-def account():
-    for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 1).value = 'WMECOM'
+def account(writing_row, row):
+    new_first_sheet.cell(row = writing_row, column = 1).value = 'WMECOM'
 
-def po_num():
-    for row_num in range(2, first_sheet.max_row + 1):
-        po = first_sheet.cell(row = row_num, column = 1).value
-        new_first_sheet.cell(row = row_num, column = 2).value = po
+def po_num(writing_row, row):
+    po = first_sheet.cell(row = row, column = 1).value
+    new_first_sheet.cell(row = writing_row, column = 2).value = po
 
-def po_line():
-    for row_num in range(2, first_sheet.max_row + 1):
-        line = first_sheet.cell(row = row_num, column = 13).value
-        new_first_sheet.cell(row = row_num, column = 3).value = line
+def po_line(writing_row, row):
+    line = first_sheet.cell(row = row, column = 13).value
+    new_first_sheet.cell(row = writing_row, column = 3).value = line
 
 
-def customer_name():
-    for row_num in range(2, first_sheet.max_row + 1):
-        name = first_sheet.cell(row = row_num, column = 5).value
-        new_first_sheet.cell(row = row_num, column = 4).value = name
+def customer_name(writing_row, row):
+    name = first_sheet.cell(row = row, column = 63).value
+    new_first_sheet.cell(row = writing_row, column = 4).value = name
 
-#Ship to or Bill to?
-def address_1():
-    for row_num in range(2, first_sheet.max_row + 1):
-        address = first_sheet.cell(row = row_num, column = 64).value
-        new_first_sheet.cell(row = row_num, column = 5).value = address
+def address_1(writing_row, row):
+    address = first_sheet.cell(row = row, column = 64).value
+    new_first_sheet.cell(row = writing_row, column = 5).value = address
 
-def phone_num():
-    for row_num in range(2, first_sheet.max_row + 1):
-        phone = first_sheet.cell(row = row_num, column = 78).value
-        new_first_sheet.cell(row = row_num, column = 6).value = phone
+def phone_num(writing_row, row):
+    phone = first_sheet.cell(row = row, column = 78).value
+    new_first_sheet.cell(row = writing_row, column = 6).value = phone
 
-def address_2():
-    for row_num in range(2, first_sheet.max_row + 1):
-        city = first_sheet.cell(row = row_num, column = 66).value
-        state = first_sheet.cell(row = row_num, column = 67).value
-        zip_code = first_sheet.cell(row = row_num, column = 68).value
+def address_2(writing_row, row):
+    city = first_sheet.cell(row = row, column = 66).value
+    state = first_sheet.cell(row = row, column = 67).value
+    zip_code = first_sheet.cell(row = row, column = 68).value
 
-        address2 = "{}, {} {}".format(city, state, zip_code)
-        new_first_sheet.cell(row = row_num, column = 7).value = address2
+    address2 = "{}, {} {}".format(city, state, zip_code)
+    new_first_sheet.cell(row = writing_row, column = 7).value = address2
 
-def carrier():
-    for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 8).value = '3PT FDXG'
+def carrier(writing_row, row):
+    new_first_sheet.cell(row = writing_row, column = 8).value = '3PT FDXG'
 
-def item_num():
-    for row_num in range(2, first_sheet.max_row + 1):
-        item_num = first_sheet.cell(row = row_num, column = 19).value
-        new_first_sheet.cell(row = row_num, column = 9).value = item_num
-        #VENDOR STYLE
+def item_num(writing_row, row):
+    item_num = first_sheet.cell(row = row, column = 19).value
+    new_first_sheet.cell(row = writing_row, column = 9).value = item_num
 
-def item_desc():
-    for row_num in range(2, first_sheet.max_row + 1):
-        item_desc = first_sheet.cell(row = row_num, column = 21).value
-        new_first_sheet.cell(row = row_num, column = 10).value = item_desc
+def item_desc(writing_row, row):
+    item_desc = first_sheet.cell(row = row, column = 21).value
+    new_first_sheet.cell(row = writing_row, column = 10).value = item_desc
 
-def quantity():
-    for row_num in range(2, first_sheet.max_row + 1):
-        quantity = first_sheet.cell(row = row_num, column = 14).value
-        new_first_sheet.cell(row = row_num, column = 11).value = quantity
+def quantity(writing_row, row):
+    quantity = first_sheet.cell(row = row, column = 14).value
+    new_first_sheet.cell(row = writing_row, column = 11).value = quantity
 
-def unit_price():
-    for row_num in range(2, first_sheet.max_row + 1):
-        unit_price = first_sheet.cell(row = row_num, column = 16).value
-        new_first_sheet.cell(row = row_num, column = 12).value = unit_price
+def unit_price(writing_row, row):
+    unit_price = first_sheet.cell(row = row, column = 16).value
+    new_first_sheet.cell(row = writing_row, column = 12).value = unit_price
 
-def terms():
-    for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 13).value = 'NET 60'
+def terms(writing_row, row):
+    new_first_sheet.cell(row = writing_row, column = 13).value = 'NET 60'
+
+def fill_empty_cells():
+    for row_num in range(2, new_first_sheet.max_row + 1):
+        #If cell is empty, set account, poline, customer, address1, phone, address2, carrier, terms == to previous
+        if (new_first_sheet.cell(row = row_num, column = 1).value) == None:
+
+            previous_acc = new_first_sheet.cell(row = row_num - 1, column = 1).value
+            new_first_sheet.cell(row = row_num, column = 1).value = previous_acc
+
+            previous_po_num = new_first_sheet.cell(row = row_num - 1, column = 2).value
+            new_first_sheet.cell(row = row_num, column = 2).value = previous_po_num
+
+            previous_customer = new_first_sheet.cell(row = row_num - 1, column = 4).value
+            new_first_sheet.cell(row = row_num, column = 4).value = previous_customer
+
+            previous_address1 = new_first_sheet.cell(row = row_num - 1, column = 5).value
+            new_first_sheet.cell(row = row_num, column = 5).value = previous_address1
+
+            previous_phone = new_first_sheet.cell(row = row_num - 1, column = 6).value
+            new_first_sheet.cell(row = row_num, column = 6).value = previous_phone
+
+            previous_address2 = new_first_sheet.cell(row = row_num - 1, column = 7).value
+            new_first_sheet.cell(row = row_num, column = 7).value = previous_address2
+
+            previous_carrier = new_first_sheet.cell(row = row_num - 1, column = 8).value
+            new_first_sheet.cell(row = row_num, column = 8).value = previous_carrier
+
+            previous_terms = new_first_sheet.cell(row = row_num - 1, column = 13).value
+            new_first_sheet.cell(row = row_num, column = 13).value = previous_terms
 
 def main():
     titles()
-    account()
-    po_num()
-    po_line()
-    customer_name()
-    address_1()
-    phone_num()
-    address_2()
-    carrier()
-    item_num()
-    item_desc()
-    quantity()
-    unit_price()
-    terms()
+    record_type()
+    fill_empty_cells()
+
 
 main()
 
-new_wb.save("test_sams.xlsx")
+new_wb.save("SBT_SAMS.xlsx")
