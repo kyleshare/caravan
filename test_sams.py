@@ -20,6 +20,20 @@ first_sheet = wb.active
 new_wb = openpyxl.Workbook()
 new_first_sheet = new_wb.active
 
+#first_po = Get PO
+#first_po_data...
+#Copy pt 1 relevant info to WRITING ROW
+#Next reading line
+#Copy pt 2 of relevant info to WRITING ROW
+#increase reading row
+#increase writing row
+#if current_po == first_po
+  #copy pt 1 relevant info from first_po or previous po to WRITING ROW
+  #copy pt 2 of relevant info to WRITING ROW
+#else:
+  #first_po = Get PO
+
+
 
 def titles():
     titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
@@ -82,14 +96,23 @@ def customer_name(writing_row, row):
     name = first_sheet.cell(row = row, column = 63).value
     new_first_sheet.cell(row = writing_row, column = 4).value = name
 
+#<Street address, Appt/Suite>
+#Appt/Suite may be in same cell as street address or 1 column right
 def address_1(writing_row, row):
-    address = first_sheet.cell(row = row, column = 64).value
-    new_first_sheet.cell(row = writing_row, column = 5).value = address
+    street_address = first_sheet.cell(row = row, column = 64).value
+    apartment = first_sheet.cell(row = row, column = 65).value
+
+    #if apartment exists on next column, add it to street address
+    if apartment != None:
+      street_address = "{} {}".format(street_address, apartment)
+
+    new_first_sheet.cell(row = writing_row, column = 5).value = street_address
 
 def phone_num(writing_row, row):
     phone = first_sheet.cell(row = row, column = 78).value
     new_first_sheet.cell(row = writing_row, column = 6).value = phone
 
+#<City, State Zip>
 def address_2(writing_row, row):
     city = first_sheet.cell(row = row, column = 66).value
     state = first_sheet.cell(row = row, column = 67).value
