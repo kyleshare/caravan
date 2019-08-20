@@ -3,10 +3,10 @@ import openpyxl
 import os
 
 #MAC filepath
-filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
 
 #WINDOWS filepath
-#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
+filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
