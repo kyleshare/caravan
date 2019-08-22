@@ -38,9 +38,12 @@ def account():
     for row_num in range(2, first_sheet.max_row + 1):
         new_first_sheet.cell(row = row_num, column = 1).value = 'TARGET'
 
+#Initial 0's omitted on downloads, make PO 10 digits
 def po_num(column_num):
     for row_num in range(2, first_sheet.max_row + 1):
         po = first_sheet.cell(row = row_num, column = column_num).value
+        po = str(po)
+        po = po.zfill(10)
         new_first_sheet.cell(row = row_num, column = 2).value = po
 #2
 def po_line(column_num):
@@ -65,13 +68,16 @@ def phone_num(column_num):
         phone = first_sheet.cell(row = row_num, column = column_num).value
         new_first_sheet.cell(row = row_num, column = 6).value = phone
 
-#skip
+#<City, State Zip>
+#Initial 0's omitted on downloads, make Zip Code 5 digits
 def address_2(column_num):
     for row_num in range(2, first_sheet.max_row + 1):
         #Assumes city state zip are next to each other
         city = first_sheet.cell(row = row_num, column = column_num).value
         state = first_sheet.cell(row = row_num, column = column_num + 1).value
         zip_code = first_sheet.cell(row = row_num, column = column_num + 2).value
+        zip_code = str(zip_code)
+        zip_code = zip_code.zfill(5)
 
         address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = row_num, column = 7).value = address2

@@ -35,9 +35,12 @@ def account():
     for row_num in range(2, first_sheet.max_row + 1):
         new_first_sheet.cell(row = row_num, column = 1).value = 'WMECOM'
 
+#Initial 0's omitted on downloads, make PO 10 digits
 def po_num():
     for row_num in range(2, first_sheet.max_row + 1):
         po = first_sheet.cell(row = row_num, column = 1).value
+        po = str(po)
+        po = po.zfill(10)
         new_first_sheet.cell(row = row_num, column = 2).value = po
 
 def po_line():
@@ -61,11 +64,15 @@ def phone_num():
         phone = first_sheet.cell(row = row_num, column = 7).value
         new_first_sheet.cell(row = row_num, column = 6).value = phone
 
+#<City, State Zip>
+#Initial 0's omitted on downloads, make Zip Code 5 digits
 def address_2():
     for row_num in range(2, first_sheet.max_row + 1):
         city = first_sheet.cell(row = row_num, column = 11).value
         state = first_sheet.cell(row = row_num, column = 12).value
         zip_code = first_sheet.cell(row = row_num, column = 13).value
+        zip_code = str(zip_code)
+        zip_code = zip_code.zfill(5)
 
         address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = row_num, column = 7).value = address2

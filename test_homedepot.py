@@ -77,6 +77,7 @@ def phone_num():
         new_row += 1
 
 #<City, State Zip>
+#Initial 0's omitted on downloads, make Zip Code 5 digits
 def address_2():
     new_row = 2
     for row_num in range(8, first_sheet.max_row + 1):
@@ -85,6 +86,8 @@ def address_2():
         #Zip comes in as ="#####", remove = and ""
         zip_code = first_sheet.cell(row = row_num, column = 11).value
         #zip_code = zip_code[2:7]
+        #zip_code = str(zip_code)
+        #zip_code = zip_code.zfill(5)
 
         address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = new_row, column = 7).value = address2

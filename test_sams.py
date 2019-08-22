@@ -3,12 +3,12 @@ import openpyxl
 import os
 
 #MAC filepath
-filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
-description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'SAMS.XLSX' )
+#description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
 
 #WINDOWS filepath
-#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'SAMS.XLSX' )
-#description_path = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'Item Description.xlsx.')
+filepath = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'SAMS.XLSX' )
+description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx.')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -54,8 +54,11 @@ def titles():
 def account(writing, reading):
     new_first_sheet.cell(row = writing, column = 1).value = 'WMECOM'
 
+#Initial 0's omitted on downloads, make PO 10 digits
 def po_num(writing, reading):
     po = first_sheet.cell(row = reading, column = 1).value
+    po = str(po)
+    po = po.zfill(10)
     new_first_sheet.cell(row = writing, column = 2).value = po
 
 def po_line(writing, reading):
@@ -84,10 +87,13 @@ def phone_num(writing, reading):
     new_first_sheet.cell(row = writing, column = 6).value = phone
 
 #<City, State Zip>
+#Initial 0's omitted on downloads, make Zip Code 5 digits
 def address_2(writing, reading):
     city = first_sheet.cell(row = reading, column = 66).value
     state = first_sheet.cell(row = reading, column = 67).value
     zip_code = first_sheet.cell(row = reading, column = 68).value
+    zip_code = str(zip_code)
+    zip_code = zip_code.zfill(5)
 
     address2 = "{}, {} {}".format(city, state, zip_code)
     new_first_sheet.cell(row = writing, column = 7).value = address2
