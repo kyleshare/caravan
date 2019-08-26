@@ -1,25 +1,58 @@
+#Kyle Share
 import openpyxl
 import os
 
 #MAC filepath
-filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '1WALMART W.H.XLSX' )
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '1WALMART W.H.XLSX' )
+#description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
 
 #WINDOWS filepath
-#filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
-
+filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
+description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx.')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
+description_wb = openpyxl.load_workbook(description_path)
 
 #Get all sheetnames
 sheet_names = wb.sheetnames
+description_sheet_names = description_wb.sheetnames
 
 #Get first worksheet, since wb.active is set to 0 by default
 first_sheet = wb.active
+description_sheet = description_wb.active
 
 #Create new workbook
 new_wb = openpyxl.Workbook()
 new_first_sheet = new_wb.active
+
+#Create dictionary of (ID: item description) pairs
+def description_dict():
+    description_list = []
+    #Iterate through description excel sheet
+    for row_num in range(2, description_sheet.max_row):
+        key = str((description_sheet.cell(row=row_num, column=1).value))
+        description = (description_sheet.cell(row=row_num, column=2).value)
+        #Create tuples, append them to description list
+        tupl = (key, description)
+        description_list.append(tupl)
+        #Make description dictionary global so item desctiption function can access it
+        global description_dict
+        description_dict = dict(description_list)
+
+def price_dict():
+    price_list = []
+    #Iterate through prices excel sheet
+    for row_num in range(2, description_sheet.max_row):
+        key = str((description_sheet.cell(row=row_num, column=1).value))
+        #Walmart price is column 3
+        price = (description_sheet.cell(row=row_num, column=3).value)
+        #Create tuples, append them to description list
+        tupl = (key, price)
+        price_list.append(tupl)
+        #Make description dictionary global so item desctiption function can access it
+        global price_dict
+        price_dict = dict(price_list)
 
 
 def titles():
@@ -74,6 +107,7 @@ def address_2():
         zip_code = str(zip_code)
         zip_code = zip_code.zfill(5)
 
+
         address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = row_num, column = 7).value = address2
 
@@ -90,30 +124,38 @@ def item_num():
 #May have 2 item desc
 def item_desc():
     for row_num in range(2, first_sheet.max_row + 1):
-        item_desc = first_sheet.cell(row = row_num, column = 20).value
+        item_num = first_sheet.cell(row = row_num, column = 18).value
+        item_desc = description_dict[item_num]
         new_first_sheet.cell(row = row_num, column = 10).value = item_desc
 
 def unit_price():
-    pass
+    for row_num in range(2, first_sheet.max_row + 1):
+        item_num = first_sheet.cell(row = row_num, column = 18).value
+        item_price = price_dict[item_num]
+        new_first_sheet.cell(row = row_num, column = 11).value = item_price
 
+#Walmart stores quantity as text, convert to int
 def quantity():
     for row_num in range(2, first_sheet.max_row + 1):
         quantity = first_sheet.cell(row = row_num, column = 21).value
-        new_first_sheet.cell(row = row_num, column = 11).value = quantity
+        quantity = int(quantity)
+        new_first_sheet.cell(row = row_num, column = 12).value = quantity
 
 
 def terms():
     for row_num in range(2, first_sheet.max_row + 1):
-        new_first_sheet.cell(row = row_num, column = 13).value = 'NET 30'
+        new_first_sheet.cell(row = row_num, column = 14).value = 'NET 30'
 
 #Use quantity and Unit price to calculate line total
 def line_total():
-    for row_num in range(2, first_sheet.max_row + 1):
-      line_total = first_sheet.cell(row = row_num, column = 11).value * \
-      first_sheet.cell(row = row_num, column = 12).value
-      first_sheet.cell(row = row_num, column = 13).value = line_total
+    for row_num in range(2, new_first_sheet.max_row + 1):
+            line_total = new_first_sheet.cell(row = row_num, column = 11).value * \
+            new_first_sheet.cell(row = row_num, column = 12).value
+            new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
 def main():
+    description_dict()
+    price_dict()
     titles()
     account()
     po_num()
@@ -128,9 +170,10 @@ def main():
     unit_price()
     quantity()
     terms()
-    #line_total()
+    #Implement after unit price is fixed
+    line_total()
 
 main()
 
 #Pass file name to save
-new_wb.save("test_copy.xlsx")
+new_wb.save("SBT_WALMART.xlsx")
