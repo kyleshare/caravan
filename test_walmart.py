@@ -3,12 +3,12 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '1WALMART W.H.XLSX' )
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '2WALMART W.H.XLSX' )
 #description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'WALMART W.H.XLSX' )
-description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx.')
+filepath = os.path.join('C:\\', 'Users', 'Akim', 'Desktop', 'WALMART.xlsx' )
+description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -27,7 +27,7 @@ new_wb = openpyxl.Workbook()
 new_first_sheet = new_wb.active
 
 #Create dictionary of (ID: item description) pairs
-def description_dict():
+def create_description_dict():
     description_list = []
     #Iterate through description excel sheet
     for row_num in range(2, description_sheet.max_row):
@@ -36,23 +36,34 @@ def description_dict():
         #Create tuples, append them to description list
         tupl = (key, description)
         description_list.append(tupl)
-        #Make description dictionary global so item desctiption function can access it
-        global description_dict
         description_dict = dict(description_list)
+    return description_dict
 
-def price_dict():
+def create_price_dict():
     price_list = []
     #Iterate through prices excel sheet
     for row_num in range(2, description_sheet.max_row):
         key = str((description_sheet.cell(row=row_num, column=1).value))
         #Walmart price is column 3
-        price = (description_sheet.cell(row=row_num, column=3).value)
+        price = (description_sheet.cell(row=row_num, column=5).value)
         #Create tuples, append them to description list
         tupl = (key, price)
         price_list.append(tupl)
-        #Make description dictionary global so item desctiption function can access it
-        global price_dict
         price_dict = dict(price_list)
+    return price_dict
+
+def create_carrier_dict():
+    carrier_list = []
+    #Iterate through prices excel sheet
+    for row_num in range(2, description_sheet.max_row):
+        key = str((description_sheet.cell(row=row_num, column=3).value))
+        #Walmart price is column 3
+        carrier = (description_sheet.cell(row=row_num, column=4).value)
+        #Create tuples, append them to description list
+        tupl = (key, carrier)
+        carrier_list.append(tupl)
+        carrier_dict = dict(carrier_list)
+    return carrier_dict
 
 
 def titles():
@@ -85,6 +96,7 @@ def po_line():
 def customer_name():
     for row_num in range(2, first_sheet.max_row + 1):
         name = first_sheet.cell(row = row_num, column = 5).value
+        name = name.upper()
         new_first_sheet.cell(row = row_num, column = 4).value = name
 
 def address_1():
@@ -111,10 +123,11 @@ def address_2():
         address2 = "{}, {} {}".format(city, state, zip_code)
         new_first_sheet.cell(row = row_num, column = 7).value = address2
 
-def carrier():
+def carrier(carrier_dict):
     for row_num in range(2, first_sheet.max_row + 1):
         carrier = first_sheet.cell(row = row_num, column = 24).value
-        new_first_sheet.cell(row = row_num, column = 8).value = carrier
+        carrier_code = carrier_dict[carrier]
+        new_first_sheet.cell(row = row_num, column = 8).value = carrier_code
 
 def item_num():
     for row_num in range(2, first_sheet.max_row + 1):
@@ -122,13 +135,14 @@ def item_num():
         new_first_sheet.cell(row = row_num, column = 9).value = item_num
 
 #May have 2 item desc
-def item_desc():
+def item_desc(description_dict):
     for row_num in range(2, first_sheet.max_row + 1):
+        print(description_dict)
         item_num = first_sheet.cell(row = row_num, column = 18).value
         item_desc = description_dict[item_num]
         new_first_sheet.cell(row = row_num, column = 10).value = item_desc
 
-def unit_price():
+def unit_price(price_dict):
     for row_num in range(2, first_sheet.max_row + 1):
         item_num = first_sheet.cell(row = row_num, column = 18).value
         item_price = price_dict[item_num]
@@ -153,9 +167,23 @@ def line_total():
             new_first_sheet.cell(row = row_num, column = 12).value
             new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
+#Fixes name for orders that ship to store, 
+def fix_name():
+    for row_num in range(2, first_sheet.max_row + 1):
+        #Check if order has store id
+        if first_sheet.cell(row = row_num, column = 8).value:
+            name = first_sheet.cell(row = row_num, column = 10).value
+            name = name.upper()
+            store_id = first_sheet.cell(row = row_num, column = 8).value
+
+            fixed_name = "{} STORE ID: {}".format(name, store_id)
+            new_first_sheet.cell(row = row_num, column = 4).value = fixed_name
+
+
 def main():
-    description_dict()
-    price_dict()
+    description_dict = create_description_dict()
+    price_dict = create_price_dict()
+    carrier_dict = create_carrier_dict()
     titles()
     account()
     po_num()
@@ -164,14 +192,15 @@ def main():
     address_1()
     phone_num()
     address_2()
-    carrier()
+    carrier(carrier_dict)
     item_num()
-    item_desc()
-    unit_price()
+    item_desc(description_dict)
+    unit_price(price_dict)
     quantity()
     terms()
     #Implement after unit price is fixed
     line_total()
+    fix_name()
 
 main()
 
