@@ -8,7 +8,7 @@ import os
 
 #WINDOWS filepath
 filepath = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'SAMS.XLSX' )
-description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx.')
+description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -26,13 +26,14 @@ description_sheet = description_wb.active
 new_wb = openpyxl.Workbook()
 new_first_sheet = new_wb.active
 
-
 #Create dictionary of (ID: item description) pairs
+#Make keys strings since key (item num) will also be string
+#Can't be integers because some item numbers start with letters
 def create_dict():
   description_list = []
   #Iterate through description excel sheet
   for row_num in range(2, description_sheet.max_row):
-    key = (description_sheet.cell(row=row_num, column=1).value)
+    key = str((description_sheet.cell(row=row_num, column=1).value))
     description = (description_sheet.cell(row=row_num, column=2).value)
     #Create tuples, append them to description list
     tupl = (key, description)
@@ -65,9 +66,9 @@ def po_line(writing, reading):
     line = first_sheet.cell(row = reading, column = 13).value
     new_first_sheet.cell(row = writing, column = 3).value = line
 
-
 def customer_name(writing, reading):
     name = first_sheet.cell(row = reading, column = 63).value
+    name = name.upper()
     new_first_sheet.cell(row = writing, column = 4).value = name
 
 #<Street address, Appt/Suite>
@@ -101,7 +102,6 @@ def address_2(writing, reading):
 def carrier(writing, reading):
     new_first_sheet.cell(row = writing, column = 8).value = '3PT FDXG'
 
-
 def item_num(writing, reading):
     item_num = first_sheet.cell(row = reading, column = 19).value
     new_first_sheet.cell(row = writing, column = 9).value = item_num
@@ -109,17 +109,20 @@ def item_num(writing, reading):
 #Use item_num as key in dictionary to get item desc
 def item_desc(writing, reading):
     item_num = first_sheet.cell(row = reading, column = 19).value
+    item_num = str(item_num)
     item_desc = description_dict[item_num]
     new_first_sheet.cell(row = writing, column = 10).value = item_desc
 
 def unit_price(writing, reading):
     unit_price = first_sheet.cell(row = reading, column = 16).value
+    #Display 2 0's after decimal
+    unit_price = float(unit_price)
+    unit_price = "{:.2f}".format(unit_price)
     new_first_sheet.cell(row = writing, column = 11).value = unit_price
 
 def quantity(writing, reading):
     quantity = first_sheet.cell(row = reading, column = 14).value
     new_first_sheet.cell(row = writing, column = 12).value = quantity
-
 
 def terms(writing, reading):
     new_first_sheet.cell(row = writing, column = 14).value = 'NET 60'
@@ -148,6 +151,7 @@ def body():
     first_po_row = 2
 
     for row in range(first_sheet.max_row):
+        #Iterate until run out of PO's. (For loop range is too large )
         if first_po != None:
 
           #Save main info since it is reused for multiple orders with same PO
@@ -180,12 +184,16 @@ def body():
             first_po = first_sheet.cell(row = reading, column = 1).value
             first_po_row = first_sheet.cell(row = reading, column = 1).row
 
-
 #Use quantity and Unit price to calculate line total
 def line_total():
     for row_num in range(2, new_first_sheet.max_row + 1):
-      line_total = new_first_sheet.cell(row = row_num, column = 11).value * \
-      new_first_sheet.cell(row = row_num, column = 12).value
+      qty =  new_first_sheet.cell(row = row_num, column = 11).value
+      price = new_first_sheet.cell(row = row_num, column = 12).value
+      price = float(price)
+      qty = float(qty)
+      line_total = qty * price
+      #Display 2 0's after decimal
+      line_total = "{:.2f}".format(line_total)
       new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
 def main():

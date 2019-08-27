@@ -8,7 +8,7 @@ import os
 
 #WINDOWS filepath
 filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'TARGET.XLSX' )
-description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx.')
+description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -68,7 +68,9 @@ def po_line(writing, reading):
 
 def customer_name(writing, reading):
     name = first_sheet.cell(row = reading, column = 62).value
+    name = name.upper()
     new_first_sheet.cell(row = writing, column = 4).value = name
+
 
 #<Street address, Appt/Suite>
 #Appt/Suite may be in same cell as street address or 1 column right
@@ -80,6 +82,7 @@ def address_1(writing, reading):
     if apartment != None:
       street_address = "{} {}".format(street_address, apartment)
 
+    street_address = street_address.upper()
     new_first_sheet.cell(row = writing, column = 5).value = street_address
 
 def phone_num(writing, reading):
@@ -96,6 +99,7 @@ def address_2(writing, reading):
     zip_code = zip_code.zfill(5)
 
     address2 = "{}, {} {}".format(city, state, zip_code)
+    address2 = address2.upper()
     new_first_sheet.cell(row = writing, column = 7).value = address2
 
 def carrier(writing, reading):
@@ -114,6 +118,9 @@ def item_desc(writing, reading):
 
 def unit_price(writing, reading):
     unit_price = first_sheet.cell(row = reading, column = 15).value
+    #Display 2 0's after decimal
+    unit_price = float(unit_price)
+    unit_price = "{:.2f}".format(unit_price)
     new_first_sheet.cell(row = writing, column = 11).value = unit_price
 
 def quantity(writing, reading):
@@ -185,8 +192,13 @@ def body():
 #Use quantity and Unit price to calculate line total
 def line_total():
     for row_num in range(2, new_first_sheet.max_row + 1):
-      line_total = new_first_sheet.cell(row = row_num, column = 11).value * \
-      new_first_sheet.cell(row = row_num, column = 12).value
+      qty =  new_first_sheet.cell(row = row_num, column = 11).value
+      price = new_first_sheet.cell(row = row_num, column = 12).value
+      price = float(price)
+      qty = float(qty)
+      line_total = qty * price
+      #Display 2 0's after decimal
+      line_total = "{:.2f}".format(line_total)
       new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
 def main():

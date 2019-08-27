@@ -102,6 +102,7 @@ def customer_name():
 def address_1():
     for row_num in range(2, first_sheet.max_row + 1):
         address = first_sheet.cell(row = row_num, column = 9).value
+        address = address.upper()
         new_first_sheet.cell(row = row_num, column = 5).value = address
 
 def phone_num():
@@ -119,8 +120,8 @@ def address_2():
         zip_code = str(zip_code)
         zip_code = zip_code.zfill(5)
 
-
         address2 = "{}, {} {}".format(city, state, zip_code)
+        address2 = address2.upper()
         new_first_sheet.cell(row = row_num, column = 7).value = address2
 
 def carrier(carrier_dict):
@@ -137,7 +138,6 @@ def item_num():
 #May have 2 item desc
 def item_desc(description_dict):
     for row_num in range(2, first_sheet.max_row + 1):
-        print(description_dict)
         item_num = first_sheet.cell(row = row_num, column = 18).value
         item_desc = description_dict[item_num]
         new_first_sheet.cell(row = row_num, column = 10).value = item_desc
@@ -145,8 +145,13 @@ def item_desc(description_dict):
 def unit_price(price_dict):
     for row_num in range(2, first_sheet.max_row + 1):
         item_num = first_sheet.cell(row = row_num, column = 18).value
-        item_price = price_dict[item_num]
-        new_first_sheet.cell(row = row_num, column = 11).value = item_price
+        unit_price = price_dict[item_num]
+
+        #Display 2 0's after decimal
+        unit_price = float(unit_price)
+        unit_price = "{:.2f}".format(unit_price)
+
+        new_first_sheet.cell(row = row_num, column = 11).value = unit_price
 
 #Walmart stores quantity as text, convert to int
 def quantity():
@@ -163,8 +168,14 @@ def terms():
 #Use quantity and Unit price to calculate line total
 def line_total():
     for row_num in range(2, new_first_sheet.max_row + 1):
-            line_total = new_first_sheet.cell(row = row_num, column = 11).value * \
-            new_first_sheet.cell(row = row_num, column = 12).value
+            qty = new_first_sheet.cell(row = row_num, column = 11).value 
+            price = new_first_sheet.cell(row = row_num, column = 12).value
+            price = float(price)
+            qty = float(qty)
+            line_total = qty * price
+            #Display 2 0's after decimal
+            line_total = float(line_total)
+            line_total = "{:.2f}".format(line_total)
             new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
 #Fixes name for orders that ship to store, 
