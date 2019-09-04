@@ -3,11 +3,11 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', '2WALMART W.H.XLSX' )
+#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'WALMART9.XLSX' )
 #description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'Akim', 'Desktop', 'WALMART.xlsx' )
+filepath = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'WALMART.xlsx' )
 description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
 
 #Get workbook from filepath
@@ -69,9 +69,9 @@ def create_carrier_dict():
 def titles():
     titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
     "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", \
-    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS"]
+    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS",  "PO TOTAL"]
     title_index = 0
-    for column_num in range(1, 15):
+    for column_num in range(1, 16):
         new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
         title_index += 1
 
@@ -178,6 +178,38 @@ def line_total():
             line_total = "{:.2f}".format(line_total)
             new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
+#Use po and line total to calculate total for each po num
+def po_total():
+    po_total = 0
+    #first_new_po is the first po number of its kind, no duplicates
+    first_new_po = new_first_sheet.cell(row = 2, column = 2).value
+    #Initialize writing row to row 2
+    po_total_writing_row = 2
+
+    for row_num in range(2, new_first_sheet.max_row + 1):
+        current_po = new_first_sheet.cell(row = row_num, column = 2).value
+        line_total = new_first_sheet.cell(row = row_num, column = 13).value
+        line_total = float(line_total)
+        #print("first po is", first_new_po, "current po is", current_po, first_new_po == current_po)
+
+        if first_new_po == current_po:
+            po_total += line_total
+       
+        else: 
+            #When po changes, write the po total to writing row
+            new_first_sheet.cell(row = po_total_writing_row, column = 15).value = po_total
+            #Reset po Total
+            po_total = 0
+            #Add current line total to new po total 
+            po_total += line_total
+            #Keep track of first new po to compare against current po
+            first_new_po = new_first_sheet.cell(row = row_num, column = 2).value
+            #Update writing row
+            po_total_writing_row = row_num
+
+    #At the end, write final po total once
+    new_first_sheet.cell(row = po_total_writing_row, column = 15).value = po_total
+
 #Fixes name for orders that ship to store, 
 def fix_name():
     for row_num in range(2, first_sheet.max_row + 1):
@@ -211,6 +243,7 @@ def main():
     terms()
     #Implement after unit price is fixed
     line_total()
+    po_total()
     fix_name()
 
 main()
