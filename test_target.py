@@ -3,12 +3,12 @@ import openpyxl
 import os
 
 #MAC filepath
-#filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'TRAGET.XLSX' )
-#description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
+filepath = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'TARGET3.XLSX' )
+description_path = os.path.join('/Users', 'KyleShare', 'Programming', 'caravan', 'Item Description.xlsx')
 
 #WINDOWS filepath
-filepath = os.path.join('C:\\', 'Users', 'CaravanArms', 'Desktop', 'TARGET.XLSX' )
-description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
+#filepath = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'TARGET3.XLSX' )
+#description_path = os.path.join('C:\\', 'Users', 'AKim', 'Desktop', 'Item Description.xlsx')
 
 #Get workbook from filepath
 wb = openpyxl.load_workbook(filepath)
@@ -29,7 +29,7 @@ new_first_sheet = new_wb.active
 #Create dictionary of (ID: item description) pairs
 #Make keys strings since key (item num) will also be string
 #Can't be integers because some item numbers start with letters
-def create_dict():
+def create_description_dict():
   description_list = []
   #Iterate through description excel sheet
   for row_num in range(2, description_sheet.max_row):
@@ -41,13 +41,25 @@ def create_dict():
     #Make description dictionary global so item desctiption function can access it
     global description_dict
     description_dict = dict(description_list)
+
+def create_carrier_dict():
+    carrier_list = []
+    #Iterate through prices excel sheet
+    for row_num in range(2, description_sheet.max_row):
+        key = str((description_sheet.cell(row=row_num, column=6).value))
+        carrier = (description_sheet.cell(row=row_num, column=7).value)
+        #Create tuples, append them to description list
+        tupl = (key, carrier)
+        carrier_list.append(tupl)
+        global carrier_dict
+        carrier_dict = dict(carrier_list)
     
 def titles():
     titles = ["ACCOUNT(SBT CODE)", "PO#", "PO LINE", "CUSTOMER NAME", "ADDRESS 1(2ND LINE)", \
     "PHONE# (3RD LINE)", "ADDRESS 2", "CARRIER", "ITEM#", "ITEM DESCRIPTION", \
-    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS"]
+    "UNIT PRICE", "QTY", "LINE TOTAL", "TERMS", "PO TOTAL"]
     title_index = 0
-    for column_num in range(1, 15):
+    for column_num in range(1, 16):
         new_first_sheet.cell(row = 1, column = column_num).value = titles[title_index]
         title_index += 1
 
@@ -103,7 +115,13 @@ def address_2(writing, reading):
     new_first_sheet.cell(row = writing, column = 7).value = address2
 
 def carrier(writing, reading):
-    new_first_sheet.cell(row = writing, column = 8).value = '3PT FDXG'
+    carrier = first_sheet.cell(row = reading, column = 9).value
+    #print(carrier)
+    #print(carrier_dict)
+    carrier_code = carrier_dict[carrier]
+    #print(carrier_code)
+    new_first_sheet.cell(row = writing, column = 8).value = carrier_code
+
 
 def item_num(writing, reading):
     item_num = first_sheet.cell(row = reading, column = 97).value
@@ -112,7 +130,14 @@ def item_num(writing, reading):
 #Use item_num as key in dictionary to get item desc
 def item_desc(writing, reading):
     item_num = first_sheet.cell(row = reading, column = 97).value
+
+    #HUGE PROBLEM, THIS STEP ONLY NEEDED IF I CHANGE FILE NAME. 
+    #WORKS FOR TARGET BUT NOT TARGET2?
+    if type(item_num) == float:
+      item_num = int(item_num)
+
     item_num = str(item_num)
+    
     item_desc = description_dict[item_num]
     new_first_sheet.cell(row = writing, column = 10).value = item_desc
 
@@ -201,11 +226,45 @@ def line_total():
       line_total = "{:.2f}".format(line_total)
       new_first_sheet.cell(row = row_num, column = 13).value = line_total
 
+#Use po and line total to calculate total for each po num
+def po_total():
+    po_total = 0
+    #first_new_po is the first po number of its kind, no duplicates
+    first_new_po = new_first_sheet.cell(row = 2, column = 2).value
+    #Initialize writing row to row 2
+    po_total_writing_row = 2
+
+    for row_num in range(2, new_first_sheet.max_row + 1):
+        current_po = new_first_sheet.cell(row = row_num, column = 2).value
+        line_total = new_first_sheet.cell(row = row_num, column = 13).value
+        line_total = float(line_total)
+        #print("first po is", first_new_po, "current po is", current_po, first_new_po == current_po)
+
+        if first_new_po == current_po:
+            po_total += line_total
+       
+        else: 
+            #When po changes, write the po total to writing row
+            new_first_sheet.cell(row = po_total_writing_row, column = 15).value = po_total
+            #Reset po Total
+            po_total = 0
+            #Add current line total to new po total 
+            po_total += line_total
+            #Keep track of first new po to compare against current po
+            first_new_po = new_first_sheet.cell(row = row_num, column = 2).value
+            #Update writing row
+            po_total_writing_row = row_num
+
+    #At the end, write final po total once
+    new_first_sheet.cell(row = po_total_writing_row, column = 15).value = po_total
+
 def main():
-    create_dict()
+    create_description_dict()
+    create_carrier_dict()
     titles()
     body()
     line_total()
+    po_total()
 
 main()
 
